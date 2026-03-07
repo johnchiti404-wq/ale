@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, X, Clock, ChevronRight } from 'lucide-react';
 import { useGlobalCart } from '../contexts/GlobalCartContext';
 import { useGeolocation } from '../hooks/useGeolocation';
+import { getCategoryConfig } from '../config/categoryConfig';
 import { mockDeliveryAddresses, getDeliveryAddressSuggestions } from '../data/mockDeliveryAddresses';
 
 interface Stop {
@@ -17,7 +18,10 @@ export function FoodiesRoute() {
   const navigate = useNavigate();
   const location = useLocation();
   const { address: currentLocation } = useGeolocation();
-  const { cart, removeFromCart } = useGlobalCart();
+  const { cart, removeFromCart, getOrderCategory } = useGlobalCart();
+
+  const category = getOrderCategory() || 'food';
+  const config = getCategoryConfig(category);
 
   const currentLocationInputRef = useRef<HTMLInputElement>(null);
   const stopInputRefs = useRef<{ [key: string]: HTMLInputElement }>({});
@@ -262,8 +266,8 @@ export function FoodiesRoute() {
 
   const getStopButtonText = (stopId: string): string => {
     const count = getFoodCountForStop(stopId);
-    if (count === 0) return 'Add food';
-    return `Food added (${count})`;
+    if (count === 0) return config.labels.addItem;
+    return config.labels.itemAdded(count);
   };
 
   const isFoodDisabled = (foodId: string, stopId: string): boolean => {
@@ -366,8 +370,8 @@ export function FoodiesRoute() {
                   className="relative ml-2 flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   whileTap={{ scale: cart.length > 0 ? 0.95 : 1 }}
                 >
-                  <span className="text-sm">🍔</span>
-                  <span className="text-[10px] font-medium text-gray-700">View your foodies</span>
+                  <span className="text-sm">{config.emoji}</span>
+                  <span className="text-[10px] font-medium text-gray-700">{config.labels.viewYourItems}</span>
                   {unselectedFoods.length > 0 && (
                     <motion.span
                       initial={{ scale: 0 }}
@@ -547,7 +551,7 @@ export function FoodiesRoute() {
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             >
               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-3xl">
-                <h2 className="text-xl font-bold text-gray-900">Your Food ({unselectedFoods.length})</h2>
+                <h2 className="text-xl font-bold text-gray-900">{config.labels.yourItems} ({unselectedFoods.length})</h2>
                 <motion.button
                   onClick={() => setShowCurrentLocationModal(false)}
                   className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
@@ -619,7 +623,7 @@ export function FoodiesRoute() {
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             >
               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-3xl">
-                <h2 className="text-xl font-bold text-gray-900">Select Food for Stop</h2>
+                <h2 className="text-xl font-bold text-gray-900">{config.labels.selectItemsForStop}</h2>
                 <motion.button
                   onClick={() => setShowStopModal(null)}
                   className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
