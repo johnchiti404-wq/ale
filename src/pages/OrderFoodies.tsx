@@ -54,7 +54,8 @@ export const OrderFoodies: React.FC = () => {
       storeName: food.storeName,
       name: food.name,
       image: food.image,
-      price: food.price
+      price: food.price,
+      category: 'food'
     });
     setRecentlyAdded(food.id);
     setTimeout(() => setRecentlyAdded(null), 500);

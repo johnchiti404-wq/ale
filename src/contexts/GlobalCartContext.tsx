@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { OrderCategory } from '../config/categoryConfig';
 
 export interface GlobalCartItem {
   id: string;
@@ -7,6 +8,7 @@ export interface GlobalCartItem {
   name: string;
   image: string;
   price: number;
+  category: OrderCategory;
 }
 
 interface GlobalCartContextType {
@@ -15,6 +17,7 @@ interface GlobalCartContextType {
   removeFromCart: (itemId: string) => void;
   clearCart: () => void;
   getCartCount: () => number;
+  getOrderCategory: () => OrderCategory | null;
 }
 
 const GlobalCartContext = createContext<GlobalCartContextType | undefined>(undefined);
@@ -26,7 +29,11 @@ export const GlobalCartProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        return parsed.map((item: any) => ({
+          ...item,
+          category: item.category || 'food'
+        }));
       } catch (error) {
         console.error('Error loading cart:', error);
         return [];
@@ -60,12 +67,18 @@ export const GlobalCartProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return cart.length;
   }, [cart]);
 
+  const getOrderCategory = useCallback((): OrderCategory | null => {
+    if (cart.length === 0) return null;
+    return cart[0].category;
+  }, [cart]);
+
   const value: GlobalCartContextType = {
     cart,
     addToCart,
     removeFromCart,
     clearCart,
-    getCartCount
+    getCartCount,
+    getOrderCategory
   };
 
   return (

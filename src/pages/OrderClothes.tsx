@@ -51,7 +51,8 @@ export const OrderClothes: React.FC = () => {
       storeName: clothing.storeName,
       name: clothing.name,
       image: clothing.image,
-      price: clothing.price
+      price: clothing.price,
+      category: 'clothes'
     });
     setRecentlyAdded(clothing.id);
     setTimeout(() => setRecentlyAdded(null), 500);
