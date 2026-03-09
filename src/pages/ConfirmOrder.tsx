@@ -9,6 +9,8 @@ import { useRideContext } from '../contexts/RideContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { database, auth } from '../config/firebase';
 import { ref, push, set } from 'firebase/database';
+import { useGlobalCart } from '../contexts/GlobalCartContext';
+import { categoryConfig } from '../config/categoryConfig';
 
 interface ConfirmOrderProps {
   destination: string;
@@ -37,6 +39,8 @@ export const ConfirmOrder: React.FC<ConfirmOrderProps> = ({
   const { profile } = useUserProfile();
   const { createRide } = useFirebaseRide();
   const { isRideActive } = useRideContext();
+  const { getOrderCategory } = useGlobalCart();
+  const orderCategory = getOrderCategory();
 
   const {
     orderType = 'ride',
@@ -317,7 +321,7 @@ export const ConfirmOrder: React.FC<ConfirmOrderProps> = ({
 
               {orderData.items && orderData.items.length > 0 && (
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <h3 className="font-semibold text-gray-900 mb-3">Food Items</h3>
+                  <h3 className="font-semibold text-gray-900 mb-3">{orderCategory ? categoryConfig[orderCategory].labels.yourItems : 'Items'}</h3>
                   <div className="space-y-2 max-h-32 overflow-y-auto">
                     {orderData.items.map((item: any, idx: number) => (
                       <div key={idx} className="flex justify-between text-sm">
@@ -332,7 +336,7 @@ export const ConfirmOrder: React.FC<ConfirmOrderProps> = ({
               <div className="bg-gray-50 rounded-xl p-4 space-y-2">
                 <h3 className="font-semibold text-gray-900 mb-3">Payment Summary</h3>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Food subtotal</span>
+                  <span className="text-gray-600">{orderCategory ? categoryConfig[orderCategory].labels.itemSubtotal : 'Subtotal'}</span>
                   <span className="font-medium text-gray-900">R {orderData.foodSubtotal}</span>
                 </div>
                 <div className="flex justify-between text-sm">
